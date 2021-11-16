@@ -7,7 +7,6 @@ MP3 player for Raspberry Pi
 - [Development](#development)
 
 ## **How to Use**
----
 PiPlayer is currently in development, but there's nothing stopping you from trying out its not-so-broken features!
 
 1. The program is meant to run on a Raspberry Pi Zero with a display. It's therefore advisable to test out its features on a Debian based Linux distribution.
@@ -57,7 +56,6 @@ python3 main.py
 To install a video to your local disk using [downloader.py](./downloader.py), provide it with a URI or simply search on YouTube using `ytsearch:"[SEARCH KEYWORD]"`. For the most accurate result, use the following format: `[SONG NAME]-[ARTIST]`. Quotation marks are needed in the youtube search to avoid producing errors.
 
 ## **Development**
----
 To setup the development environment, follow the [How to Use](#how-to-use) instructions up to the part where you execute the applications.
 
 PiPlayer comes with two applications. One of them, [downloader.py](./downloader.py), is adding songs to the playlist convinient. The other application, [main.py](./main.py), runs the GUI mp3 application. The GUI and its functionalities are powered by tkinter,
