@@ -9,7 +9,8 @@ MP3 player for Raspberry Pi
 ## **How to Use**
 PiPlayer is currently in development, but there's nothing stopping you from trying out its not-so-broken features!
 
-1. The program is meant to run on a Raspberry Pi Zero with a display. It's therefore advisable to test out its features on a Debian based Linux distribution.
+1. The program is meant to run on a Raspberry Pi with a display. It's therefore advisable to test out its features on a Debian based Linux distribution. The programs *will* break if run on a Windows based system without WSL (Windows Subsystem for Linux).
+
 2. Install git:
 ```
 sudo apt-get update
@@ -38,10 +39,14 @@ source venv/bin/activate
 6. Install all required packages with pip:
 ```
 # Install pip if you don't have it
-sudo apt install python3-pip
+sudo apt-get install python3-pip
 
 pip3 install -r requirements.txt
 pip3 install tkinter
+```
+7. The video downloader application is able to convert video and incompatible audio formats to the MP3 format. Therefore, install FFmpeg to utilize this application:
+```
+sudo apt-get install ffmpeg
 ```
 
 The program comes with two seperate applications: video downloader and mp3 player. To use the video downloader:
