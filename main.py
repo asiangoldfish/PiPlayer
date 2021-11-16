@@ -1,7 +1,14 @@
 import pygame
-import tkinter as tk
-from tkinter.filedialog import askdirectory
 import os
+from sys import exit
+
+try:
+    import tkinter as tk
+except ImportError:
+    print("Failed to import required module: tkinter.\nInstall package using 'pip install tkinter'.")
+    exit()
+
+from tkinter.filedialog import askdirectory
 
 # TODOS
 # - Filter out anything that is not an audio file for var song_list
