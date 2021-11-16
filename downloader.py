@@ -20,32 +20,7 @@ from tkinter.filedialog import askdirectory
 from youtube_dl.utils import DownloadError
 
 
-def __main():
-    """Main function in the program. Same functionality as main in C language,
-    but without argc argv.
-    """
-    # String in cases where user did not provide a command
-    missing_cmd = "Missing command. Use -h or --help."
-    invalid_cmd = "Invalid command. Use -h or --help"
-
-    # Dictionary with all available flags
-    switcher = {
-        "-d": downloader,
-        "--downloader": downloader,
-        "-h": helper,
-        "--helper": helper,
-    }
-
-    try:
-        key = argv[1]
-    except IndexError:
-        print(missing_cmd)
-        exit()
-
-    value = switcher.get(key, invalid_cmd)
-    value()
-
-
+# Manual
 def helper():
     """Help menu with list of commands
     """
@@ -63,6 +38,7 @@ def helper():
     print(help_string)
 
 
+# Downloads videos from URIs or based on youtube search
 def downloader():
     system("clear")
 
@@ -114,9 +90,37 @@ def downloader():
     print(glob("./audio/*.webm", ))
 
 
+# Converts video or incompatible audio files to audio file format
 def convert_audio():
     """Rename and/or convert video files to audio files
     """
+
+
+# Main function of the program
+def __main():
+    """Main function in the program. Same functionality as main in C language,
+    but without argc argv.
+    """
+    # String in cases where user did not provide a command
+    missing_cmd = "Missing command. Use -h or --help."
+    invalid_cmd = "Invalid command. Use -h or --help"
+
+    # Dictionary with all available flags
+    switcher = {
+        "-d": downloader,
+        "--downloader": downloader,
+        "-h": helper,
+        "--helper": helper,
+    }
+
+    try:
+        key = argv[1]
+    except IndexError:
+        print(missing_cmd)
+        exit()
+
+    value = switcher.get(key, invalid_cmd)
+    value()
 
 
 if __name__ == "__main__":
