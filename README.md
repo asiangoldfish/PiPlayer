@@ -9,7 +9,7 @@ MP3 player for Raspberry Pi
 ## **How to Use**
 PiPlayer is currently in development, but there's nothing stopping you from trying out its not-so-broken features!
 
-1. The program is meant to run on a Raspberry Pi with a display. It's therefore advisable to test out its features on a Debian based Linux distribution. The programs *will* break if run on a Windows based system without WSL (Windows Subsystem for Linux).
+1. The program is meant to run on a Raspberry Pi with a display. It's therefore advisable to test out its features on a Debian based Linux distribution. The programs may break if run on a Windows based system without WSL (Windows Subsystem for Linux).
 
 2. Install git:
 ```
