@@ -2,7 +2,7 @@ from sys import stdout, exit, argv
 from os import system, chdir, getcwd, path, mkdir
 
 # Managing subprocesses, usually run outside Python's control
-from subprocess import run, check_output
+from subprocess import run, SubprocessError
 
 # File pattern matching
 from glob import glob
@@ -149,11 +149,12 @@ def convert_audio() -> None:
 
         # Convert file to mp3 formatted file
         try:
-            check_output(
-                f"ffmpeg -i '.{new_path}' .'{file_new_ext}'", shell=True)
-        except Exception:
+            run(
+                f"ffmpeg -i .'{new_path}' .'{file_new_ext}'", shell=True, check=True)
+        except Exception as conv_e:
+            # All other errors unrelated to the subprocess module
             # Register full path of unsuccessful files during conversion
-            printc("Unable to convert file", "red")
+            print(conv_e)
             failed_files.append(file)
 
     # Success message for converting files
@@ -166,9 +167,13 @@ def convert_audio() -> None:
             file = file.split(f"{getcwd()}/audio/")[1]
             print(f"- {file}")
 
-        print("\nThey may have failed because there were \\, \" or \' in the file name.")
-        print("You can ignore this if it was because you skipped them.")
-        print("Consider remove these and try again.")
+    # If an error happened during the conversion, assume that it's either missing
+    # ffmpeg installed on the system or there's an error in the file name
+    if len(failed_files) == len(files):
+        print("\nErrors were found while attempting to convert files.")
+        print("Ensure that ffmpeg is installed on the system: ffmpeg --version")
+        print("If not, then there may be special cases in the file name(s)")
+        exit()
 
     ################################################################################
 
@@ -177,19 +182,19 @@ def convert_audio() -> None:
     # Only proceed with deleting old files if any files were converted at all
 
     # This functionality is not complete yet
-    """
+
     if len(files) > len(failed_files):
         try:
             prompt = input(
                 "\nDelete old files that were successfully converted (this cannot be undone!)? [y/N] ")
         except KeyboardInterrupt:
-            exit("\nAborting deletion of fold files...")
+            exit("\nAborting deletion of old files...")
 
         # Deletes old files one by one if user says yes
         if prompt.casefold() == "y":
             print("Deleting old files...")
-            system(f"rm {file}")
-    """
+            for file in files:
+                system(f"rm '{file}'")
 
 
 # Manual
