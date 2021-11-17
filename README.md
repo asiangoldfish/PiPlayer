@@ -42,7 +42,13 @@ source venv/bin/activate
 sudo apt-get install python3-pip
 
 pip3 install -r requirements.txt
+```
+6a. Tkinter can be tricky to install. Try the following methods (if one of them works, then skip the others):
+Note: Use the last option to install tkinter on Raspberry Pi
+```
 pip3 install tkinter
+sudo apt install python3-tkinter
+sudo apt install python-tk
 ```
 7. The video downloader application is able to convert video and incompatible audio formats to the MP3 format. Therefore, install FFmpeg to utilize this application:
 ```
