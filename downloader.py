@@ -19,32 +19,40 @@ from youtube_dl.utils import DownloadError
 def downloader():
     system("clear")
 
+    # Stores all new audio files in audio directory within this project folder. If this folder doesn't exist,
+    # then creates a new audio directory. Lastly, changes present directory to this directory.
     audiodir_path = f"{getcwd()}/audio/"
     print(f"Files will be stored in {audiodir_path}")
 
-    # Looks for directory called audio within the project. If does not exist, create a new audio directory
     if not path.isdir("audio"):
         print("Could not find the audio folder. Creating a new folder")
         mkdir(audiodir_path, 0o777)
 
     chdir(audiodir_path)
 
+    # Prompts user to enter a URI or perform a youtube search. A URI must begin with either "http",
+    # "www" or similar to be considered a valid URI. Otherwise it defaults to a youtube search.
+    # Cancel with CTRL+D, and additionally allows multiple requests at the same time.
     print("Enter video URIs. Enter without URI to proceed with downloading")
-    print('To instead search on YouTube, prefix with "ytsearch:". Example: ytsearch:"Forget you - Cee Lo Green"')
+    print('To instead search on YouTube, prefix with "ytsearch:"')
 
-    # Infinite loop to capture all links to donwload
+    # Perform an infinite loop to capture all requests.
     urls_list = list()
     while True:
-        # Exit program with CTRL+C
         try:
             url = input(f"Link: ")
         except KeyboardInterrupt:
-            exit("")  # Print prompt on new line
+            exit("")
 
         if url == "":
             stdout.write("\033[F")  # back to previous line
             stdout.write("\033[K")  # clear line
             break
+        
+        # Default the request to youtube search, unless "http", "www" or similar has been entered.
+        uri_request = ["http", "www"]
+        if url[0:3] or url[0:2] not in uri_request:
+            url = f"ytsearch: {url}"
 
         urls_list.append(url)
 
