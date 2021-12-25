@@ -16,64 +16,122 @@ from youtube_dl.utils import DownloadError
 
 
 # Downloads videos from URIs or based on youtube search
-def downloader():
-    system("clear")
+def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
+    """Downloads online videos to local disk
+
+    Takes song or url requests, prompting the user to use requests from the
+    file songs.txt, or as invidivual requests from the command line interface.
+    Each line in the filerepresents one request. URI validations are simple
+    and considers any requests starting with "http" or "www" as valid. Any
+    other requests are considered a YouTube search.
+
+    The download destination by default is targeted at /present/working/
+    directory/audio/.
+    """
+
+    def default_search(request, urls_list):
+        """Defaults youtube_dl's search option to youtube search
+
+        Args:
+            request (str): URI or YouTube search request
+        """
+        # Default the request to youtube search, unless "http", "www" or similar has been entered.
+        subdomains = ["http", "www"]
+        if request[0:3] or request[0:2] not in subdomains:
+            request = f"ytsearch: {request}"
+
+        urls_list.append(request)
 
     # Stores all new audio files in audio directory within this project folder. If this folder doesn't exist,
     # then creates a new audio directory. Lastly, changes present directory to this directory.
-    audiodir_path = f"{getcwd()}/audio/"
-    print(f"Files will be stored in {audiodir_path}")
-
-    if not path.isdir("audio"):
-        print("Could not find the audio folder. Creating a new folder")
-        mkdir(audiodir_path, 0o777)
-
-    chdir(audiodir_path)
-
-    # Prompts user to enter a URI or perform a youtube search. A URI must begin with either "http",
-    # "www" or similar to be considered a valid URI. Otherwise it defaults to a youtube search.
-    # Cancel with CTRL+D, and additionally allows multiple requests at the same time.
-    print("Enter video URIs. Enter without URI to proceed with downloading")
-    print('To instead search on YouTube, prefix with "ytsearch:"')
-
-    # Perform an infinite loop to capture all requests.
+    audiodir_path = f"{working_dir}/audio/"
     urls_list = list()
-    while True:
+
+    prompt = input(f"Fetch requests automatically from {songsfile}? [Y/n]")
+
+    ###############################
+    # If-statement branch 1 start #
+    ###############################
+    if prompt == "" or prompt == "y" or prompt == "Y":
+        """Fetches requests from file with song requests
+
+        The file's name defaults to songs.txt and appends each line to the
+        urls_list variable.
+        """
+        # Opens the songsfile, read each line as request and appends them to
+        # the url_listvariable
         try:
-            url = input(f"Link: ")
-        except KeyboardInterrupt:
-            exit("")
+            read_songfile = open(songsfile, "r")
+        except FileNotFoundError:
+            exit(f"File {songsfile} was not found at {getcwd()}/")
 
-        if url == "":
-            stdout.write("\033[F")  # back to previous line
-            stdout.write("\033[K")  # clear line
-            break
-        
-        # Default the request to youtube search, unless "http", "www" or similar has been entered.
-        uri_request = ["http", "www"]
-        if url[0:3] or url[0:2] not in uri_request:
-            url = f"ytsearch: {url}"
+        request = read_songfile.readline()
 
-        urls_list.append(url)
+        # Loops through each line and appends each request to the urls_list
+        while request:
+            request = request.strip("\n")
+            default_search(request, urls_list)
+            request = read_songfile.readline()
+
+        read_songfile.close()
+
+    ###############################
+    # If-statement branch 2 start #
+    ###############################
+    else:
+        """Prompts user to enter a URI or perform a youtube search. A URI must
+        begin with either "http", "www" or similar to be considered a valid
+        URI. Otherwise it defaults to a youtube search.
+        Cancel with CTRL+D, and additionally allows multiple requests at
+        the same time.
+        """
+
+        print("Enter video URIs. Enter without URI to proceed with downloading")
+        print('To instead search on YouTube, prefix with "ytsearch:"')
+
+        # Perform an infinite loop to capture all requests.
+        while True:
+            try:
+                url = input(f"Link: ")
+            except KeyboardInterrupt:
+                exit("")
+
+            if url == "":
+                stdout.write("\033[F")  # back to previous line
+                stdout.write("\033[K")  # clear line
+                break
+
+            # Appends request to urls_list
+            default_search()
 
     # Terminate program if no input has been provided
     if len(urls_list) <= 0:
-        print("No URIs have been provided. Terminating program")
-        exit()
+        if prompt == "" or prompt == "y" or prompt == "Y":
+            exit(f"No URIs were provided in {songsfile}")
+        else:
+            exit(f"No URIs were provided.")
 
-    # Clears terminal and downloads audios
+    # Change directory to audio, so all new files are stored here
+    if not path.isdir("audio"):
+        mkdir(audiodir_path, 0o777)
+    chdir(audiodir_path)
+
+    # Downloads audios
     print("Downloading videos...")
-    audio_downloader = YoutubeDL({"format": "bestaudio"})
+    audio_downloader = YoutubeDL({"format": "bestaudio",
+                                  "restrictfilenames": True,
+                                  "ignoreerrors": True,
+                                  "outtmpl": '%(title)s.%(ext)s'
+                                  })
 
     # Error handle if download uri is invalid
     try:
         audio_downloader.download(urls_list)
     except DownloadError as e:
         print(e)
-        exit()
+        exit("An error occurred the downloads were aborted")
 
-    # Convert video to audio files
-    print(glob("./audio/*.webm", ))
+    convert_audio()
 
 
 # Converts video or incompatible audio files to audio file format
@@ -85,15 +143,13 @@ def convert_audio() -> None:
     formats = ["3gp", "aac", "flv", "m4a", "mp4", "ogg", "webm"]
     files = list()
 
-    path_to_search_for = f"{getcwd()}/audio"
-
     # Searches for all files with the extensions in formats[].
     # Loops through each element in formats, one at a time
     for i, format in enumerate(formats):
 
         # Searches through all files with specified extension (format[i]),
         # returning a list. Joins this with the existing files[]
-        found_files = glob(f"{path_to_search_for}/*.{formats[i]}")
+        found_files = glob(f"*.{formats[i]}")
 
         # Do nothing if files with the specified extensions were not found,
         # else append found files to files[]
@@ -104,7 +160,6 @@ def convert_audio() -> None:
 
     # Terminate program if no files were round
     if len(files) <= 0:
-        print(f"Directory to search in: {getcwd()}/audio/")
         print(
             f"Attempting to find files with any of the following extensions: ")
 
@@ -112,21 +167,17 @@ def convert_audio() -> None:
         for format in formats:
             print(f"- {format}")
 
-        print(
+        exit(
             f"Could not find any matching files to convert..")
-        exit()
 
     ################################################################################
 
-    # Clear terminal
-    system("clear")
-
-    # Prompt user for converting files
     print(f"Attempting to convert files in:", end="\n\n")
     for file in files:
-        new_file = file.split(f"{getcwd()}/audio/")
-        print(new_file[1])
-    # Exit program is user keyboard interrupts
+        new_file = file.split(f"{getcwd()}")
+        print(new_file[0])
+
+    """ # Exit program is user keyboard interrupts
     try:
         prompt = input("\nAre you sure you would like to proceed? [y/N] ")
     except KeyboardInterrupt:
@@ -134,10 +185,8 @@ def convert_audio() -> None:
 
     if prompt.casefold() == "y":
         print("Converting files to mp3 format...")
-        pass
     else:
-        print("Aborting conversion...")
-        exit()
+        exit("Aborting conversion...") """
 
     ################################################################################
 
@@ -147,7 +196,7 @@ def convert_audio() -> None:
     failed_files = list()
 
     for file in files:
-        new_path = file.split(f"{getcwd()}")[1]
+        new_path = f"{getcwd()}/{file}"
 
         # Extracts the file path without extension.
         file_no_ext = new_path.split(".")[0]
@@ -158,7 +207,7 @@ def convert_audio() -> None:
         # Convert file to mp3 formatted file
         try:
             run(
-                f"ffmpeg -i .'{new_path}' .'{file_new_ext}'", shell=True, check=True)
+                f"ffmpeg -i '{new_path}' '{file_new_ext}'", shell=True, check=True)
         except Exception as conv_e:
             # All other errors unrelated to the subprocess module
             # Register full path of unsuccessful files during conversion
@@ -190,19 +239,21 @@ def convert_audio() -> None:
     # Only proceed with deleting old files if any files were converted at all
 
     # This functionality is not complete yet
-
+    """
     if len(files) > len(failed_files):
         try:
             prompt = input(
                 "\nDelete old files that were successfully converted (this cannot be undone!)? [y/N] ")
         except KeyboardInterrupt:
             exit("\nAborting deletion of old files...")
+    """
 
-        # Deletes old files one by one if user says yes
-        if prompt.casefold() == "y":
-            print("Deleting old files...")
-            for file in files:
-                system(f"rm '{file}'")
+    # Deletes old files one by one if user says yes
+    # if prompt.casefold() == "y":
+
+    #print("Deleting old files...")
+    for file in files:
+        system(f"rm '{file}'")
 
 
 # Manual
@@ -225,16 +276,15 @@ def helper():
 
 
 # Rename files
-def rename_files(dirpath: str = None) -> None:
-    """Rename all files
+def rename_files(filename: str) -> None:
+    """Rename files
 
     Args:
-        dirpath (str, optional): [description]. Defaults to None.
+        filename (str, optional): [description]. Defaults to None.
     """
 
     # Default filepath
-    if dirpath is None:
-        dirpath = f"{getcwd()}/audio/"
+    dirpath = f"{getcwd()}/audio/"
 
     # Error handle if there is no audio directory
     try:
@@ -256,8 +306,8 @@ def main():
 
     # Dictionary with all available flags
     switcher = {
-        "-d": downloader,
-        "--downloader": downloader,
+        "-d": download,
+        "--downloader": download,
         "-h": helper,
         "--helper": helper,
         "-c": convert_audio,
@@ -316,4 +366,5 @@ def printc(string: str, code: str,) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    download()
