@@ -7,6 +7,7 @@ Audio Downloader is a cross-platform application and is also compatible with a v
 ## Contents
 - [Setup Guide](#how-to-use)
 - [How to Use](#how-to-use)
+- [Disclaimers](#disclaimers)
 
 ## Setup Guide
 Setting up the Audio Downloader is a simple and straight forward task. Below you can pick the guide for your operating system:
@@ -26,3 +27,6 @@ Once you run the command `python3 main.py`, enter "y" to fetch the requests.
 
 ### Command Line Interface Requests
 When prompted after starting the application, enter "n". Then search for the song to download.
+
+## Disclaimers
+The application cannot evaluate the license or copy-rights policies related to any media. All it does is creating a userfriendly interface to youtube_dl.
