@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Audio files from YL downloads
-audio/*
+audio/
+songs.txt
