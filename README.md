@@ -9,7 +9,7 @@ Audio Downloader is a cross-platform application and is also compatible with a v
 - [How to Use](#how-to-use)
 
 ## Setup Guide
-Setting up the Audio Downloader is simple a simple and straight forward task. Below you can pick the guide for your operating system:
+Setting up the Audio Downloader is a simple and straight forward task. Below you can pick the guide for your operating system:
 - [Debian](./docs/debian)
 
 ## How to Use
