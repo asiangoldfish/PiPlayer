@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Audio files from YL downloads
+audio/
+songs.txt
