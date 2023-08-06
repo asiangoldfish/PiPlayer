@@ -14,6 +14,7 @@ from textwrap import dedent
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import DownloadError
 
+import config
 
 # Downloads videos from URIs or based on youtube search
 def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
@@ -29,7 +30,7 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
     directory/audio/.
     """
 
-    def default_search(request, urls_list):
+    def default_search(request, urls_list = None):
         """Defaults youtube_dl's search option to youtube search
 
         Args:
@@ -47,7 +48,12 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
     audiodir_path = f"{working_dir}/audio/"
     urls_list = list()
 
-    prompt = input(f"Fetch requests automatically from {songsfile}? [Y/n]")
+    # Keyboard interrupt
+    try:
+        prompt = input(f"Fetch requests automatically from {songsfile}? [Y/n] ")
+    except:
+        print("")
+        exit(0)
 
     ###############################
     # If-statement branch 1 start #
@@ -95,6 +101,8 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
                 url = input(f"Link: ")
             except KeyboardInterrupt:
                 exit("")
+            except EOFError:
+                exit("")
 
             if url == "":
                 stdout.write("\033[F")  # back to previous line
@@ -102,7 +110,7 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
                 break
 
             # Appends request to urls_list
-            default_search()
+            default_search(url, urls_list)
 
     # Terminate program if no input has been provided
     if len(urls_list) <= 0:
@@ -126,12 +134,13 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
 
     # Error handle if download uri is invalid
     try:
-        audio_downloader.download(urls_list)
+        audio_downloader.download()
     except DownloadError as e:
         print(e)
         exit("An error occurred the downloads were aborted")
-
-    convert_audio()
+    
+    if (config.enable_audio_converter):
+        convert_audio()
 
 
 # Converts video or incompatible audio files to audio file format
@@ -180,7 +189,7 @@ def convert_audio() -> None:
     """ # Exit program is user keyboard interrupts
     try:
         prompt = input("\nAre you sure you would like to proceed? [y/N] ")
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:1
         exit("\nAborting conversion...")
 
     if prompt.casefold() == "y":
