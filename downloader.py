@@ -134,13 +134,14 @@ def download(working_dir: str = getcwd(), songsfile: str = "songs.txt"):
 
     # Error handle if download uri is invalid
     try:
-        audio_downloader.download()
-    except DownloadError as e:
+        audio_downloader.download(urls_list)
+    except Exception as e:
         print(e)
         exit("An error occurred the downloads were aborted")
     
     if (config.enable_audio_converter):
         convert_audio()
+        pass
 
 
 # Converts video or incompatible audio files to audio file format
