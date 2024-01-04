@@ -1,9 +1,5 @@
 # Audio Downloader
 
-## Known Bug
-The application does not work as a fix is currently being worked on. An implementation that use https://github.com/yt-dlp/yt-dlp is being worked on.
-
-
 # Description
 Audio Downloader is a cross-platform application and is also compatible with a vast range of [sites](http://online.verypdf.com/app/youtube-downloader/supported-video-sites.php) and provides a simple way to download your favourite songs, podcasts and other audio tracks. It utilizes [youtube_dl](https://github.com/ytdl-org/youtube-dl/tree/2021.12.17) to perform the download, and [FFmpeg](https://ffmpeg.org/) for converting to audio files. Other features include:
 - Batch download
